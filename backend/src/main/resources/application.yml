@@ -23,7 +23,7 @@ spring:
       max-request-size: 10MB
 
 server:
-  port: 5000
+  port: ${PORT:8080}
 
 jwt:
   secret: chaveSuperSecretaComPeloMenos32Caracteres!
