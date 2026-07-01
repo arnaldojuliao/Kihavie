@@ -2,13 +2,11 @@ import Navbar from "./Navbar";
 import Footer from "./Footer";
 import Spinner from "../ui/Spinner";
 import { useAuth } from "../../context/AuthContext";
-import { useProducts } from "../../context/ProductContext";
 
 function Layout({ children }) {
   const { isLoading: authLoading, isLoggingIn, isLoggingOut } = useAuth();
-  const { loading: productsLoading } = useProducts();
 
-  const isLoading = authLoading || productsLoading || isLoggingIn || isLoggingOut;
+  const isLoading = authLoading || isLoggingIn || isLoggingOut;
 
   if (isLoading) {
     return <Spinner />;
