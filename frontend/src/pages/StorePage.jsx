@@ -1,9 +1,9 @@
-import { useParams, Link } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useParams, Link, useLocation } from "react-router-dom";
+import { useEffect, useState, useMemo } from "react";
 import ProductGrid from "../components/product/ProductGrid";
 import { getStoreById } from "../services/storeService";
-import { getProductsByStoreId } from "../services/productService";
 import { useAuth } from "../context/AuthContext";
+import { useProducts } from "../context/ProductContext";
 import {
   FaStar,
   FaCalendarAlt,
@@ -14,37 +14,89 @@ import {
 import { FiSettings } from "react-icons/fi";
 import { BiPlus } from "react-icons/bi";
 
+const CACHE_KEY_STORE = "kihavie_store_";
+const CACHE_TTL = 10 * 60 * 1000; // 10 min
+
 function StorePage() {
   const { storeId } = useParams();
+  const location = useLocation();
   const { user, isAuthenticated, isAdmin } = useAuth();
-  const [store, setStore] = useState(null);
-  const [storeProducts, setStoreProducts] = useState([]);
+  const { products } = useProducts();
+
+  const [store, setStore] = useState(() => {
+    // 1. Prioridade máxima: dados vindos da navegação (ex: ProductDetail)
+    if (location.state?.store) return location.state.store;
+    // 2. Fallback: cache localStorage
+    try {
+      const raw = localStorage.getItem(CACHE_KEY_STORE + storeId);
+      if (raw) {
+        const { data, timestamp } = JSON.parse(raw);
+        if (Date.now() - timestamp < CACHE_TTL) return data;
+        localStorage.removeItem(CACHE_KEY_STORE + storeId);
+      }
+    } catch { /* ignora */ }
+    return null; // precisa carregar da API
+  });
+
+  // Produtos filtrados do cache global (instantâneo)
+  const storeProducts = useMemo(
+    () => products.filter((p) => String(p.storeId) === storeId),
+    [products, storeId]
+  );
 
   const isOwner = isAuthenticated && String(user?.storeId) === storeId;
 
   useEffect(() => {
-    const fetchData = async () => {
+    // Se já temos a loja correta para este storeId, não precisa buscar
+    if (store && String(store.id) === storeId) return;
+
+    // Tentar dados vindos da navegação (route state)
+    const stateStore = location.state?.store;
+    if (stateStore && String(stateStore.id) === storeId) {
+      setStore(stateStore);
+      // Guarda no cache para visitas futuras
       try {
-        const storeData = await getStoreById(storeId);
+        if (!localStorage.getItem(CACHE_KEY_STORE + storeId)) {
+          localStorage.setItem(
+            CACHE_KEY_STORE + storeId,
+            JSON.stringify({ data: stateStore, timestamp: Date.now() })
+          );
+        }
+      } catch { /* ignora */ }
+      return;
+    }
+
+    // Tentar cache localStorage
+    try {
+      const raw = localStorage.getItem(CACHE_KEY_STORE + storeId);
+      if (raw) {
+        const { data, timestamp } = JSON.parse(raw);
+        if (Date.now() - timestamp < CACHE_TTL) {
+          setStore(data);
+          return;
+        }
+        localStorage.removeItem(CACHE_KEY_STORE + storeId);
+      }
+    } catch { /* ignora */ }
+
+    // Buscar da API
+    setStore(null);
+    getStoreById(storeId)
+      .then((storeData) => {
         if (!storeData) {
-          setStore(undefined); // loja não encontrada
+          setStore(undefined);
           return;
         }
         setStore(storeData);
-      } catch {
-        setStore(undefined); // erro ao buscar loja
-        return;
-      }
-
-      try {
-        const products = await getProductsByStoreId(storeId);
-        setStoreProducts(products);
-      } catch (error) {
-        console.error("Erro ao carregar produtos:", error);
-      }
-    };
-    fetchData();
-  }, [storeId]);
+        try {
+          localStorage.setItem(
+            CACHE_KEY_STORE + storeId,
+            JSON.stringify({ data: storeData, timestamp: Date.now() })
+          );
+        } catch { /* localStorage cheio */ }
+      })
+      .catch(() => setStore(undefined));
+  }, [storeId, location.state?.store]);
 
   const getSettingsLink = () => {
     if (isOwner) {

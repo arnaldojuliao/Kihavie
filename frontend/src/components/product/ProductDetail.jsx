@@ -122,7 +122,11 @@ useEffect(() => {
       )}
 
       {product.storeId && (
-        <Link to={`/store/${product.storeId}`} className="inline-block text-blue-600 hover:underline">
+        <Link
+          to={`/store/${product.storeId}`}
+          state={{ store }}
+          className="inline-block text-blue-600 hover:underline"
+        >
           Ver mais produtos desta loja
         </Link>
       )}
