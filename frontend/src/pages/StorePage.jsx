@@ -18,23 +18,29 @@ function StorePage() {
   const { storeId } = useParams();
   const { user, isAuthenticated, isAdmin } = useAuth();
   const [store, setStore] = useState(null);
-  const [loading, setLoading] = useState(true);
   const [storeProducts, setStoreProducts] = useState([]);
 
   const isOwner = isAuthenticated && String(user?.storeId) === storeId;
 
   useEffect(() => {
     const fetchData = async () => {
-      setLoading(true);
       try {
         const storeData = await getStoreById(storeId);
+        if (!storeData) {
+          setStore(undefined); // loja não encontrada
+          return;
+        }
         setStore(storeData);
+      } catch {
+        setStore(undefined); // erro ao buscar loja
+        return;
+      }
+
+      try {
         const products = await getProductsByStoreId(storeId);
         setStoreProducts(products);
       } catch (error) {
-        console.error("Erro ao carregar loja:", error);
-      } finally {
-        setLoading(false);
+        console.error("Erro ao carregar produtos:", error);
       }
     };
     fetchData();
@@ -52,15 +58,11 @@ function StorePage() {
     return null; // sem permissão (não mostra ícone)
   };
 
-  if (loading) {
-    return (
-      <div className="text-center py-12">
-        <p className="text-slate-500">Carregando loja...</p>
-      </div>
-    );
+  if (store === null) {
+    return null; // ainda carregando — não renderiza nada
   }
 
-  if (!store) {
+  if (store === undefined) {
     return (
       <div className="text-center py-12">
         <h1 className="text-2xl font-bold mb-4">Loja não encontrada</h1>
