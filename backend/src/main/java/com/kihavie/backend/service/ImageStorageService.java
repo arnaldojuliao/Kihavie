@@ -1,60 +1,51 @@
 package com.kihavie.backend.service;
 
-import org.springframework.beans.factory.annotation.Value;
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
 import org.springframework.stereotype.Service;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Base64;
-import java.util.UUID;
+import java.util.Map;
 
 @Service
 public class ImageStorageService {
 
-    @Value("${file.upload-dir}")
-    private String uploadDir;
+    private final Cloudinary cloudinary;
+
+    public ImageStorageService(Cloudinary cloudinary) {
+        this.cloudinary = cloudinary;
+    }
 
     public String saveProfileImage(String userId, String base64Data) {
         return saveImage("profiles", userId, base64Data);
     }
 
-    public String saveProductImage(Long productId, String base64Data) {
-        return saveImage("products", productId.toString(), base64Data);
+    public String saveProductImage(String productId, String base64Data) {
+        return saveImage("products", productId, base64Data);
     }
 
     private String saveImage(String folder, String id, String base64Data) {
         try {
-            Path uploadPath = Paths.get(uploadDir, folder);
-            if (!Files.exists(uploadPath)) {
-                Files.createDirectories(uploadPath);
-            }
-
-            // Detecta extensão da imagem
-            String extension = "jpg";
-            if (base64Data.contains("data:image/png")) {
-                extension = "png";
-            } else if (base64Data.contains("data:image/jpeg")) {
-                extension = "jpg";
-            } else if (base64Data.contains("data:image/webp")) {
-                extension = "webp";
-            }
-
-            // Remove o prefixo do base64 se existir
+            // Remove o prefixo do base64 se existir (ex: "data:image/png;base64,")
             String base64Body = base64Data;
             if (base64Data.contains(",")) {
                 base64Body = base64Data.split(",")[1];
             }
 
             byte[] imageBytes = Base64.getDecoder().decode(base64Body);
-            String fileName = id + "_" + UUID.randomUUID().toString().substring(0, 8) + "." + extension;
-            Path filePath = uploadPath.resolve(fileName);
-            Files.write(filePath, imageBytes);
 
-            // Retorna URL relativa (ex: "/uploads/profiles/123_abc.jpg")
-            return "/uploads/" + folder + "/" + fileName;
+            // Determine a public_id a partir do folder + id
+            String publicId = folder + "/" + id + "_" + System.currentTimeMillis();
+
+            // Faz upload para o Cloudinary
+            Map<?, ?> uploadResult = cloudinary.uploader().upload(imageBytes, ObjectUtils.asMap(
+                "public_id", publicId,
+                "overwrite", true
+            ));
+
+            // Retorna a URL segura (HTTPS) da imagem
+            return (String) uploadResult.get("secure_url");
         } catch (Exception e) {
-            throw new RuntimeException("Erro ao salvar imagem: " + e.getMessage(), e);
+            throw new RuntimeException("Erro ao fazer upload para Cloudinary: " + e.getMessage(), e);
         }
     }
 }
