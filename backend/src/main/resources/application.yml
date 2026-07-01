@@ -3,14 +3,14 @@ spring:
     name: backend
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/kihavie_db
-    username: arnaldojuliaoj2
-    password: 849352
+    url: ${DATABASE_URL}
+    username: ${DATABASE_USER}
+    password: ${DATABASE_PASSWORD}
     driver-class-name: org.postgresql.Driver
 
   jpa:
     hibernate:
-      ddl-auto: update   # alterado para update para migrar as colunas de BIGINT para VARCHAR(50) após a mudança dos IDs
+      ddl-auto: update
     show-sql: true
     properties:
       hibernate:
@@ -23,11 +23,11 @@ spring:
       max-request-size: 10MB
 
 server:
-  port: 5000
+  port: ${PORT:5000}
 
 jwt:
-  secret: chaveSuperSecretaComPeloMenos32Caracteres!
+  secret: ${JWT_SECRET}
   expiration: 86400000
 
 file:
-  upload-dir: ./uploads
+  upload-dir: /tmp/uploads
