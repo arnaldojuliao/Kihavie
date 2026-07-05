@@ -1,14 +1,16 @@
 import { useRef, useEffect, useCallback } from "react";
-import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
+import { FiChevronLeft, FiChevronRight, FiShoppingCart } from "react-icons/fi";
 import ProductGrid from "../components/product/ProductGrid";
 import { useProducts } from "../context/ProductContext";
+import { useCart } from "../context/CartContext";
 import { Link } from "react-router-dom";
 
 function Home() {
   const { activeProducts } = useProducts();
+  const { addToCart } = useCart();
   const topProducts = activeProducts.slice(0, 4);
   const trackRef = useRef(null);
-  const animationRef = useRef(null);
+  const intervalRef = useRef(null);
   const isPausedRef = useRef(false);
   const scrollTimeoutRef = useRef(null);
 
@@ -21,51 +23,42 @@ function Home() {
     return firstCard.offsetWidth + 12;
   }, []);
 
+  // Card-by-card auto-scroll every 3 seconds (Shoppable UGC Video Slider style)
   useEffect(() => {
     const track = trackRef.current;
     if (!track || topProducts.length === 0) return;
 
-    const gap = 12; // gap-3 = 12px
     const halfIndex = topProducts.length;
 
-    const scroll = () => {
-      if (isPausedRef.current) {
-        animationRef.current = requestAnimationFrame(scroll);
-        return;
-      }
+    const scrollNext = () => {
+      if (isPausedRef.current) return;
 
       const step = getStep();
       const currentScroll = track.scrollLeft;
-      const target = currentScroll + 1;
 
-      if (currentScroll >= step * halfIndex) {
+      // If we've scrolled past the original set, reset seamlessly
+      if (currentScroll >= step * (halfIndex - 0.5)) {
         track.scrollLeft = 0;
       } else {
-        track.scrollLeft = target;
+        track.scrollBy({ left: step, behavior: "smooth" });
       }
-
-      animationRef.current = requestAnimationFrame(scroll);
     };
 
-    animationRef.current = requestAnimationFrame(scroll);
+    intervalRef.current = setInterval(scrollNext, 3000);
 
-    // Pause on hover
+    // Pause on hover / touch
     const handleMouseEnter = () => { isPausedRef.current = true; };
     const handleMouseLeave = () => { isPausedRef.current = false; };
     track.addEventListener("mouseenter", handleMouseEnter);
     track.addEventListener("mouseleave", handleMouseLeave);
 
     return () => {
-      if (animationRef.current) {
-        cancelAnimationFrame(animationRef.current);
-      }
-      if (scrollTimeoutRef.current) {
-        clearTimeout(scrollTimeoutRef.current);
-      }
+      if (intervalRef.current) clearInterval(intervalRef.current);
+      if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
       track.removeEventListener("mouseenter", handleMouseEnter);
       track.removeEventListener("mouseleave", handleMouseLeave);
     };
-  }, [topProducts]);
+  }, [topProducts, getStep]);
 
   const scrollByCard = useCallback((direction) => {
     const track = trackRef.current;
@@ -86,6 +79,25 @@ function Home() {
     });
   }, [getStep]);
 
+  const getMainImage = (product) => {
+    if (product.images && product.images.length > 0) return product.images[0];
+    if (product.image) return product.image;
+    return "https://via.placeholder.com/250?text=Sem+imagem";
+  };
+
+  const handleAddToCart = (e, product) => {
+    e.preventDefault();
+    e.stopPropagation();
+    addToCart({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      image: getMainImage(product),
+      quantity: 1,
+      storeId: product.storeId,
+    });
+  };
+
   return (
     <div className="home-page">
       {/* Categorias */}
@@ -98,12 +110,12 @@ function Home() {
         </Link>
       </article>
 
-      {/* Os Mais Vendidos — Carrossel automático */}
+      {/* Os Mais Vendidos — Shoppable UGC Video Slider */}
       <section className="mb-8">
         <div className="flex items-center justify-center flex-col mb-3">
           <p className="text-black text-2xl font-semibold">Os Mais Vendidos</p>
           <p className="text-slate-600 text-center text-sm">
-            Os produtos mais populares da nossa plataforma
+            Deslize para explorar os produtos mais populares
           </p>
         </div>
 
@@ -132,45 +144,59 @@ function Home() {
             <FiChevronRight className="text-slate-700" size={22} />
           </button>
 
-        <div
-          ref={trackRef}
-          className="flex gap-3 overflow-x-auto hidden-scrollbar"
-        >
-          {carouselProducts.length > 0 ? (
-            carouselProducts.map((product, index) => {
-              const image =
-                product.images?.[0] ||
-                product.image ||
-                "https://via.placeholder.com/250?text=Sem+imagem";
-              return (
-                <Link
-                  key={`${product.id}-${index}`}
-                  to={`/product/${product.id}`}
-                  className="shrink-0 w-[100px] sm:w-[120px] md:w-[140px] group"
-                >
-                  <div className="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-lg transition-shadow">
-                    <div className="w-[100px] h-[100px] sm:w-[120px] sm:h-[120px] md:w-[140px] md:h-[140px] bg-slate-100 overflow-hidden">
-                      <img
-                        src={image}
-                        alt={product.name}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                      />
+          <div
+            ref={trackRef}
+            className="flex gap-3 overflow-x-auto hidden-scrollbar pb-1"
+          >
+            {carouselProducts.length > 0 ? (
+              carouselProducts.map((product, index) => {
+                const image = getMainImage(product);
+                return (
+                  <Link
+                    key={`${product.id}-${index}`}
+                    to={`/product/${product.id}`}
+                    className="shrink-0 w-[55vw] sm:w-[200px] md:w-[220px] group/card"
+                  >
+                    <div className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 relative">
+                      {/* Image — tall portrait aspect ratio (UGC video style) */}
+                      <div className="w-full h-[70vw] sm:h-[270px] md:h-[290px] bg-slate-100 overflow-hidden relative">
+                        <img
+                          src={image}
+                          alt={product.name}
+                          className="w-full h-full object-cover group-hover/card:scale-105 transition-transform duration-500"
+                        />
+                        {/* Price badge overlay */}
+                        <div className="absolute bottom-2 left-2 bg-black/65 text-white text-xs font-bold px-2.5 py-1 rounded-lg backdrop-blur-sm">
+                          MT {Number(product.price).toFixed(2)}
+                        </div>
+                        {/* Shopping CTA — always visible on mobile, hover on desktop */}
+                        <button
+                          onClick={(e) => handleAddToCart(e, product)}
+                          className="absolute bottom-2 right-2 bg-blue-600 text-white p-2.5 rounded-full shadow-lg hover:bg-blue-700 active:scale-90 transition-all duration-200 md:opacity-0 md:group-hover/card:opacity-100"
+                          aria-label="Adicionar ao carrinho"
+                        >
+                          <FiShoppingCart size={16} />
+                        </button>
+                      </div>
+                      {/* Product info */}
+                      <div className="p-2.5">
+                        <h3 className="font-semibold text-xs sm:text-sm leading-tight truncate">
+                          {product.name}
+                        </h3>
+                        <p className="text-[10px] sm:text-xs text-slate-400 mt-0.5 truncate">
+                          {product.description || "Produto popular"}
+                        </p>
+                      </div>
                     </div>
-                    <div className="p-1">
-                      <h3 className="font-semibold text-[10px] leading-tight text-center truncate">
-                        {product.name}
-                      </h3>
-                    </div>
-                  </div>
-                </Link>
-              );
-            })
-          ) : (
-            <p className="text-slate-500 text-center w-full py-8">
-              Nenhum produto disponível no momento.
-            </p>
-          )}
-        </div>
+                  </Link>
+                );
+              })
+            ) : (
+              <p className="text-slate-500 text-center w-full py-8">
+                Nenhum produto disponível no momento.
+              </p>
+            )}
+          </div>
         </div>
       </section>
 
