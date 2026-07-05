@@ -15,14 +15,18 @@ function Home() {
   // Duplicate products for seamless infinite loop
   const carouselProducts = [...topProducts, ...topProducts];
 
+  const getStep = useCallback(() => {
+    const firstCard = trackRef.current?.children[0];
+    if (!firstCard) return 112;
+    return firstCard.offsetWidth + 12;
+  }, []);
+
   useEffect(() => {
     const track = trackRef.current;
     if (!track || topProducts.length === 0) return;
 
-    const cardWidth = 100; // px
     const gap = 12; // gap-3 = 12px
-    const step = cardWidth + gap; // 112px per card
-    const halfIndex = topProducts.length; // reset when we've scrolled past the first half
+    const halfIndex = topProducts.length;
 
     const scroll = () => {
       if (isPausedRef.current) {
@@ -30,10 +34,10 @@ function Home() {
         return;
       }
 
+      const step = getStep();
       const currentScroll = track.scrollLeft;
       const target = currentScroll + 1;
 
-      // If we've scrolled past the original set, reset smoothly
       if (currentScroll >= step * halfIndex) {
         track.scrollLeft = 0;
       } else {
@@ -67,9 +71,7 @@ function Home() {
     const track = trackRef.current;
     if (!track) return;
 
-    const cardWidth = 100;
-    const gap = 12;
-    const step = cardWidth + gap;
+    const step = getStep();
 
     // Temporarily pause auto-scroll for 4 seconds
     isPausedRef.current = true;
@@ -82,7 +84,7 @@ function Home() {
       left: direction === "left" ? -step : step,
       behavior: "smooth",
     });
-  }, []);
+  }, [getStep]);
 
   return (
     <div className="home-page">
@@ -144,10 +146,10 @@ function Home() {
                 <Link
                   key={`${product.id}-${index}`}
                   to={`/product/${product.id}`}
-                  className="shrink-0 w-[100px] group"
+                  className="shrink-0 w-[100px] sm:w-[120px] md:w-[140px] group"
                 >
                   <div className="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-lg transition-shadow">
-                    <div className="w-[100px] h-[100px] bg-slate-100 overflow-hidden">
+                    <div className="w-[100px] h-[100px] sm:w-[120px] sm:h-[120px] md:w-[140px] md:h-[140px] bg-slate-100 overflow-hidden">
                       <img
                         src={image}
                         alt={product.name}
