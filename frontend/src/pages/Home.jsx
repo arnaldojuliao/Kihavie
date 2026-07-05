@@ -9,13 +9,14 @@ function Home() {
   const { activeProducts } = useProducts();
   const { addToCart } = useCart();
   const topProducts = activeProducts.slice(0, 4);
+  const mobileProducts = topProducts.slice(0, 3);
   const trackRef = useRef(null);
   const intervalRef = useRef(null);
   const isPausedRef = useRef(false);
   const scrollTimeoutRef = useRef(null);
 
   // Duplicate products for seamless infinite loop
-  const carouselProducts = [...topProducts, ...topProducts];
+  const carouselProducts = [...mobileProducts, ...mobileProducts];
 
   const getStep = useCallback(() => {
     const firstCard = trackRef.current?.children[0];
@@ -26,9 +27,9 @@ function Home() {
   // Card-by-card auto-scroll every 3 seconds (Shoppable UGC Video Slider style)
   useEffect(() => {
     const track = trackRef.current;
-    if (!track || topProducts.length === 0) return;
+    if (!track || mobileProducts.length === 0) return;
 
-    const halfIndex = topProducts.length;
+    const halfIndex = mobileProducts.length;
 
     const scrollNext = () => {
       if (isPausedRef.current) return;
@@ -58,7 +59,7 @@ function Home() {
       track.removeEventListener("mouseenter", handleMouseEnter);
       track.removeEventListener("mouseleave", handleMouseLeave);
     };
-  }, [topProducts, getStep]);
+  }, [mobileProducts, getStep]);
 
   const scrollByCard = useCallback((direction) => {
     const track = trackRef.current;
@@ -129,7 +130,7 @@ function Home() {
           {/* Left arrow */}
           <button
             onClick={() => scrollByCard("left")}
-            className="absolute left-0 top-0 bottom-0 z-10 w-8 opacity-60 md:opacity-0 md:group-hover/carousel:opacity-100 transition-opacity duration-200 flex items-center justify-center bg-gradient-to-r from-white/80 to-transparent hover:from-white cursor-pointer"
+            className="hidden sm:flex absolute left-0 top-0 bottom-0 z-10 w-8 opacity-60 md:opacity-0 md:group-hover/carousel:opacity-100 transition-opacity duration-200 items-center justify-center bg-gradient-to-r from-white/80 to-transparent hover:from-white cursor-pointer"
             aria-label="Anterior"
           >
             <FiChevronLeft className="text-slate-700" size={22} />
@@ -138,7 +139,7 @@ function Home() {
           {/* Right arrow */}
           <button
             onClick={() => scrollByCard("right")}
-            className="absolute right-0 top-0 bottom-0 z-10 w-8 opacity-60 md:opacity-0 md:group-hover/carousel:opacity-100 transition-opacity duration-200 flex items-center justify-center bg-gradient-to-l from-white/80 to-transparent hover:from-white cursor-pointer"
+            className="hidden sm:flex absolute right-0 top-0 bottom-0 z-10 w-8 opacity-60 md:opacity-0 md:group-hover/carousel:opacity-100 transition-opacity duration-200 items-center justify-center bg-gradient-to-l from-white/80 to-transparent hover:from-white cursor-pointer"
             aria-label="Seguinte"
           >
             <FiChevronRight className="text-slate-700" size={22} />
@@ -146,33 +147,42 @@ function Home() {
 
           <div
             ref={trackRef}
-            className="flex gap-3 overflow-x-auto hidden-scrollbar pb-1"
+            className="flex items-end justify-center gap-1.5 sm:gap-3 overflow-x-auto hidden-scrollbar pb-2 pt-1 px-1"
           >
             {carouselProducts.length > 0 ? (
               carouselProducts.map((product, index) => {
                 const image = getMainImage(product);
+                const isCenter = index % mobileProducts.length === 1;
                 return (
                   <Link
                     key={`${product.id}-${index}`}
                     to={`/product/${product.id}`}
-                    className="shrink-0 w-[55vw] sm:w-[200px] md:w-[220px] group/card"
+                    className={`shrink-0 group/card transition-all duration-300 ${isCenter ? "w-[130px] sm:w-[200px] md:w-[220px] scale-[1.03]" : "w-[90px] sm:w-[170px] md:w-[200px] opacity-90"}`}
                   >
-                    <div className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 relative">
+                    <div className={`bg-white rounded-2xl overflow-hidden shadow-[0_8px_24px_rgba(15,23,42,0.10)] hover:shadow-[0_12px_30px_rgba(15,23,42,0.16)] transition-all duration-300 relative border ${isCenter ? "border-blue-200 shadow-[0_10px_28px_rgba(37,99,235,0.16)]" : "border-slate-100"} ${isCenter ? "ring-1 ring-blue-100" : ""}`}>
                       {/* Image — tall portrait aspect ratio (UGC video style) */}
-                      <div className="w-full h-[70vw] sm:h-[270px] md:h-[290px] bg-slate-100 overflow-hidden relative">
+                      <div className={`w-full ${isCenter ? "h-[180px] sm:h-[270px] md:h-[290px]" : "h-[120px] sm:h-[230px] md:h-[250px]"} bg-slate-100 overflow-hidden relative rounded-t-2xl`}>
                         <img
                           src={image}
                           alt={product.name}
                           className="w-full h-full object-cover group-hover/card:scale-105 transition-transform duration-500"
                         />
+                        {isCenter && (
+                          <>
+                            <div className="absolute inset-x-0 top-0 h-12 bg-gradient-to-b from-slate-900/20 to-transparent" />
+                            <div className="absolute top-2 left-2 bg-blue-600/90 text-[10px] font-semibold text-white px-2 py-1 rounded-full">
+                              Destaque
+                            </div>
+                          </>
+                        )}
                         {/* Price badge overlay */}
-                        <div className="absolute bottom-2 left-2 bg-black/65 text-white text-xs font-bold px-2.5 py-1 rounded-lg backdrop-blur-sm">
+                        <div className="absolute bottom-2 left-2 bg-black/70 text-white text-[10px] sm:text-xs font-bold px-2.5 py-1 rounded-full backdrop-blur-sm">
                           MT {Number(product.price).toFixed(2)}
                         </div>
                         {/* Shopping CTA — always visible on mobile, hover on desktop */}
                         <button
                           onClick={(e) => handleAddToCart(e, product)}
-                          className="absolute bottom-2 right-2 bg-blue-600 text-white p-2.5 rounded-full shadow-lg hover:bg-blue-700 active:scale-90 transition-all duration-200 md:opacity-0 md:group-hover/card:opacity-100"
+                          className="absolute bottom-2 right-2 bg-blue-600 text-white p-2 rounded-full shadow-lg hover:bg-blue-700 active:scale-90 transition-all duration-200 md:opacity-0 md:group-hover/card:opacity-100"
                           aria-label="Adicionar ao carrinho"
                         >
                           <FiShoppingCart size={16} />
@@ -180,10 +190,10 @@ function Home() {
                       </div>
                       {/* Product info */}
                       <div className="p-2.5">
-                        <h3 className="font-semibold text-xs sm:text-sm leading-tight truncate">
+                        <h3 className={`font-semibold text-[10px] sm:text-sm leading-tight truncate ${isCenter ? "text-slate-900" : "text-slate-700"}`}>
                           {product.name}
                         </h3>
-                        <p className="text-[10px] sm:text-xs text-slate-400 mt-0.5 truncate">
+                        <p className="text-[9px] sm:text-xs text-slate-400 mt-0.5 truncate">
                           {product.description || "Produto popular"}
                         </p>
                       </div>
