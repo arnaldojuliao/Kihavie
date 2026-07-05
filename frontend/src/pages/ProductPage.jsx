@@ -4,6 +4,7 @@ import ProductImages from "../components/product/ProductImages";
 import ProductDetail from "../components/product/ProductDetail";
 import ProductGrid from "../components/product/ProductGrid";
 import { useProducts } from "../context/ProductContext";
+import { useScrollToTop } from "../hooks/useScrollToTop";
 import { FaArrowLeft } from "react-icons/fa6";
 
 function ProductPage() {
@@ -21,6 +22,8 @@ function ProductPage() {
     if (prod?.image) return [prod.image];
     return ["https://via.placeholder.com/250?text=Sem+imagem"];
   };
+
+  useScrollToTop(id);
 
   // eslint-disable-next-line react-hooks/preserve-manual-memoization
   const relatedProducts = useMemo(

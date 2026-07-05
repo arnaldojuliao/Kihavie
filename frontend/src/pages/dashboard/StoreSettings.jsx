@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
+import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { getStoreById, updateStore } from "../../services/storeService";
-import { Link } from "react-router-dom";
 
 function StoreSettings() {
+  const navigate = useNavigate();
   const { user } = useAuth();
   const [formData, setFormData] = useState({
     name: "",
@@ -73,9 +74,11 @@ function StoreSettings() {
       });
       setMessage({
         type: "success",
-        text: "Configurações salvas com sucesso!",
+        text: "Configurações salvas! Redirecionando...",
       });
-      setTimeout(() => setMessage(null), 2000);
+      setTimeout(() => {
+        navigate(`/store/${storeId}`);
+      }, 1500);
     } catch {
       setMessage({ type: "error", text: "Erro ao salvar configurações." });
     } finally {
@@ -110,9 +113,9 @@ function StoreSettings() {
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="max-w-3xl space-y-8">
-        <div className="bg-white border shadow-xl border-slate-200 rounded-lg p-8">
-          <h2 className="text-xl font-semibold mb-6">Informações da loja</h2>
+      <form onSubmit={handleSubmit} className="max-w-3xl space-y-6">
+        <div className="bg-white border shadow-xl border-slate-200 rounded-lg p-4 sm:p-8">
+          <h2 className="text-xl font-semibold mb-4 sm:mb-6">Informações da loja</h2>
 
           <div className="space-y-4">
             <div>
@@ -171,8 +174,8 @@ function StoreSettings() {
           </div>
         </div>
 
-        <div className="bg-white border shadow-xl border-slate-200 rounded-lg p-8">
-          <h2 className="text-xl font-semibold mb-6">Endereço</h2>
+        <div className="bg-white border shadow-xl border-slate-200 rounded-lg p-4 sm:p-8">
+          <h2 className="text-xl font-semibold mb-4 sm:mb-6">Endereço</h2>
 
           <div className="space-y-4">
             <div>

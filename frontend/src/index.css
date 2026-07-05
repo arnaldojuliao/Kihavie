@@ -1,12 +1,11 @@
 @import "tailwindcss";
 
-:root{
-    --primary: #0000;
+:root {
+  --primary: #2563eb;
+  --secondary: #ffffff;
 }
 
-/* class bg-[var(--primary)] */
-
-
-.dark{
-    --secundary:#ffff;
+.dark {
+  --primary: #60a5fa;
+  --secondary: #1e293b;
 }

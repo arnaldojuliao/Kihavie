@@ -1,9 +1,8 @@
 import { Link } from "react-router-dom";
+import { calculateCartTotals } from "../../utils/cartCalculations";
 
 function CartSummary({ totalItems, totalPrice }) {
-  const taxAmount = totalPrice * 0.1;
-  const shippingCost = totalPrice > 0 ? 10 : 0;
-  const finalTotal = totalPrice + taxAmount + shippingCost;
+  const { taxAmount, shippingCost, finalTotal } = calculateCartTotals(totalPrice);
 
   return (
     <div className="cart-summary bg-slate-100 shadow-2xl rounded-lg p-4 sm:p-6 sticky top-6 h-fit">

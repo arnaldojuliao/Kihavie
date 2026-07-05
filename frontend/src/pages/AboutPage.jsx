@@ -92,13 +92,13 @@ function AboutPage() {
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <a
               href="/register"
-              className="bg-blue-600 text-white active:shadow-red-500 active:shadow px-5 sm:px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition text-center"
+              className="bg-blue-600 text-white active:scale-95 px-5 sm:px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition text-center"
             >
               Criar Conta
             </a>
             <a
               href="/"
-              className="bg-slate-200 text-slate-900 active:shadow-blue-600 active:shadow px-5 sm:px-6 py-3 rounded-lg font-semibold hover:bg-slate-300 transition text-center"
+              className="bg-slate-200 text-slate-900 active:scale-95 px-5 sm:px-6 py-3 rounded-lg font-semibold hover:bg-slate-300 transition text-center"
             >
               Explorar Produtos
             </a>

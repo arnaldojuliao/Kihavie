@@ -10,6 +10,7 @@ import { saveOrder } from "../services/orderService";
 import { getStoreById } from "../services/storeService";
 import { useToast } from "../context/ToastContext";
 import { BiArrowBack } from "react-icons/bi";
+import { calculateCartTotals } from "../utils/cartCalculations";
 
 function CheckoutPage() {
   const navigate = useNavigate();
@@ -21,9 +22,7 @@ function CheckoutPage() {
   const [paymentMethod, setPaymentMethod] = useState(null);
   const { showToast } = useToast();
 
-  const taxAmount = totalPrice * 0.1;
-  const shippingCost = 10;
-  const finalTotal = totalPrice + taxAmount + shippingCost;
+  const { taxAmount, shippingCost, finalTotal } = calculateCartTotals(totalPrice);
 
   if (!user) return <div className="p-8 text-center">Carregando...</div>;
   if (cart.length === 0)
@@ -72,6 +71,9 @@ function CheckoutPage() {
         items: cart,
         shippingData,
         paymentMethod,
+        subtotal: totalPrice,
+        taxAmount,
+        shippingCost,
         totalAmount: finalTotal,
         status: paymentMethod === "chat" ? "Aguardando contato" : "Processando",
         storeId: cart[0]?.storeId,
@@ -148,7 +150,7 @@ function CheckoutPage() {
       showToast(
         "Instruções para pagamento via M-Pesa: envie o valor para o número 84 000 0000 e confirme no chat.",
       );
-      finalizeOrder({ mobileNumber: "840000000" });
+      finalizeOrder();
     }
   };
 

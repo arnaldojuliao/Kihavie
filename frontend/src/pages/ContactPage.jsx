@@ -210,7 +210,7 @@ function ContactPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-blue-600 text-white active:shadow-red-500 active:shadow py-3 rounded-lg font-semibold hover:bg-blue-700 disabled:bg-slate-400 disabled:cursor-not-allowed"
+                className="w-full bg-blue-600 text-white active:scale-95 py-3 rounded-lg font-semibold hover:bg-blue-700 disabled:bg-slate-400 disabled:cursor-not-allowed"
               >
                 {loading ? "Enviando..." : "Enviar mensagem"}
               </button>

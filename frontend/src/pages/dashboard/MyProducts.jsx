@@ -54,27 +54,28 @@ function MyProducts() {
           to="/dashboard/add-product"
           className="bg-blue-600 text-white p-  rounded-lg hover:bg-blue-700 font-semibold"
         >
-          <BiPlus size={48} title="Adicionar" />
+          <BiPlus size={36} className="sm:w-12 sm:h-12" title="Adicionar" />
         </Link>
       </div>
 
       <div className="bg-white border border-slate-200 rounded-lg overflow-hidden">
-        <table className="w-full">
+        <div className="overflow-x-auto">
+        <table className="w-full min-w-150">
           <thead className="bg-slate-50 border-b border-slate-200">
             <tr>
-              <th className="px-4 py-3 text-left text-sm font-semibold">
+              <th className="px-2 sm:px-4 py-3 text-left text-xs sm:text-sm font-semibold">
                 Produto
               </th>
-              <th className="px-3 py-3 text-left text-sm font-semibold">
+              <th className="px-2 sm:px-3 py-3 text-left text-xs sm:text-sm font-semibold">
                 Preço
               </th>
-              <th className="px-3 py-3 text-left text-sm font-semibold">
+              <th className="px-2 sm:px-3 py-3 text-left text-xs sm:text-sm font-semibold">
                 Estoque
               </th>
-              <th className="px-3 py-3 text-left text-sm font-semibold">
+              <th className="px-2 sm:px-3 py-3 text-left text-xs sm:text-sm font-semibold">
                 Status
               </th>
-              <th className="px-3 py-3 text-left text-sm font-semibold">
+              <th className="px-2 sm:px-3 py-3 text-left text-xs sm:text-sm font-semibold">
                 Ações
               </th>
             </tr>
@@ -123,6 +124,7 @@ function MyProducts() {
             ))}
           </tbody>
         </table>
+        </div>
       </div>
 
       {userProducts.length === 0 && (

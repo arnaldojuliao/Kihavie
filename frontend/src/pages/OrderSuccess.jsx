@@ -106,15 +106,15 @@ function OrderSuccess() {
           <div className="bg-slate-50 rounded-lg p-4 mb-6">
             <div className="flex justify-between text-slate-700 mb-3">
               <span>Subtotal</span>
-              <span>MT {(order.totalAmount * 0.81).toFixed(2)}</span>
+              <span>MT {order.subtotal?.toFixed(2) ?? ((order.totalAmount - 10) / 1.1).toFixed(2)}</span>
             </div>
             <div className="flex justify-between text-slate-700 mb-3">
               <span>Impostos (10%)</span>
-              <span>MT {(order.totalAmount * 0.09).toFixed(2)}</span>
+              <span>MT {order.taxAmount?.toFixed(2) ?? ((order.totalAmount - 10) / 11).toFixed(2)}</span>
             </div>
             <div className="flex justify-between text-slate-700 mb-3">
               <span>Envio</span>
-              <span>MT 10.00</span>
+              <span>MT {order.shippingCost?.toFixed(2) ?? "10.00"}</span>
             </div>
             <div className="flex justify-between text-lg font-bold text-slate-900 pt-3 border-t border-slate-200">
               <span>Total</span>

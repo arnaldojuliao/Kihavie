@@ -1,5 +1,6 @@
 import { useParams, Link, useLocation } from "react-router-dom";
 import { useEffect, useState, useMemo } from "react";
+import { useScrollToTop } from "../hooks/useScrollToTop";
 import ProductGrid from "../components/product/ProductGrid";
 import { getStoreById } from "../services/storeService";
 import { useAuth } from "../context/AuthContext";
@@ -98,6 +99,8 @@ function StorePage() {
       .catch(() => setStore(undefined));
   }, [storeId, location.state?.store]);
 
+  useScrollToTop(storeId);
+
   const getSettingsLink = () => {
     if (isOwner) {
       // Dono da loja (seja admin ou não) → dashboard normal
@@ -105,7 +108,7 @@ function StorePage() {
     }
     if (isAdmin) {
       // Administrador a ver loja de outro → painel admin
-      return `/admin/store/dashboard`;
+      return `/admin/store/${storeId}`;
     }
     return null; // sem permissão (não mostra ícone)
   };

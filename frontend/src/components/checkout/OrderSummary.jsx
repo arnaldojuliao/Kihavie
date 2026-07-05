@@ -1,11 +1,10 @@
 import { useCart } from "../../context/CartContext";
+import { calculateCartTotals } from "../../utils/cartCalculations";
 
 function OrderSummary() {
   const { cart, totalPrice } = useCart();
 
-  const taxAmount = totalPrice * 0.1;
-  const shippingCost = 10;
-  const finalTotal = totalPrice + taxAmount + shippingCost;
+  const { taxAmount, shippingCost, finalTotal } = calculateCartTotals(totalPrice);
 
   return (
     <div className="order-summary shadow-xl bg-slate-50 rounded-lg p-6 h-fit sticky top-6">

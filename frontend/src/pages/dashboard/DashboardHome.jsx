@@ -99,46 +99,46 @@ function DashboardHome() {
           <p className="text-slate-600">Bem-vindo, {user?.name}! Visão geral da plataforma.</p>
         </div>
 
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
-          <div className="bg-white border rounded-lg p-4 sm:p-6 shadow-sm">
-            <div className="text-3xl sm:text-4xl mb-2">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-4 mb-6 sm:mb-8">
+          <div className="bg-white border rounded-lg p-3 sm:p-6 shadow-sm">
+            <div className="text-2xl sm:text-4xl mb-1 sm:mb-2">
               <BsPeople className="text-indigo-600" />
             </div>
-            <p className="text-slate-600 text-xs sm:text-sm">Total de Utilizadores</p>
-            <p className="text-xl sm:text-2xl font-bold">{stats.totalUsers || 0}</p>
+            <p className="text-slate-600 text-xs sm:text-sm">Utilizadores</p>
+            <p className="text-lg sm:text-2xl font-bold">{stats.totalUsers || 0}</p>
           </div>
-          <div className="bg-white border rounded-lg p-4 sm:p-6 shadow-sm">
-            <div className="text-3xl sm:text-4xl mb-2">
+          <div className="bg-white border rounded-lg p-3 sm:p-6 shadow-sm">
+            <div className="text-2xl sm:text-4xl mb-1 sm:mb-2">
               <BsBuilding className="text-blue-600" />
             </div>
-            <p className="text-slate-600 text-xs sm:text-sm">Total de Lojas</p>
-            <p className="text-xl sm:text-2xl font-bold">{stats.totalStores || 0}</p>
+            <p className="text-slate-600 text-xs sm:text-sm">Lojas</p>
+            <p className="text-lg sm:text-2xl font-bold">{stats.totalStores || 0}</p>
           </div>
-          <div className="bg-white border rounded-lg p-4 sm:p-6 shadow-sm">
-            <div className="text-3xl sm:text-4xl mb-2">
+          <div className="bg-white border rounded-lg p-3 sm:p-6 shadow-sm">
+            <div className="text-2xl sm:text-4xl mb-1 sm:mb-2">
               <BsBox className="text-green-600" />
             </div>
-            <p className="text-slate-600 text-xs sm:text-sm">Total de Produtos</p>
-            <p className="text-xl sm:text-2xl font-bold">{stats.totalProducts}</p>
+            <p className="text-slate-600 text-xs sm:text-sm">Produtos</p>
+            <p className="text-lg sm:text-2xl font-bold">{stats.totalProducts}</p>
           </div>
-          <div className="bg-white border rounded-lg p-4 sm:p-6 shadow-sm">
-            <div className="text-3xl sm:text-4xl mb-2">
+          <div className="bg-white border rounded-lg p-3 sm:p-6 shadow-sm">
+            <div className="text-2xl sm:text-4xl mb-1 sm:mb-2">
               <BsClipboard2Check className="text-purple-600" />
             </div>
-            <p className="text-slate-600 text-xs sm:text-sm">Total de Pedidos</p>
-            <p className="text-xl sm:text-2xl font-bold">{stats.totalOrders}</p>
+            <p className="text-slate-600 text-xs sm:text-sm">Pedidos</p>
+            <p className="text-lg sm:text-2xl font-bold">{stats.totalOrders}</p>
           </div>
         </div>
 
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
-          <div className="bg-white border rounded-lg p-4 sm:p-6 shadow-sm">
-            <div className="text-3xl sm:text-4xl mb-2">💰</div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-2 sm:gap-4 mb-6 sm:mb-8">
+          <div className="bg-white border rounded-lg p-3 sm:p-6 shadow-sm col-span-1">
+            <div className="text-2xl sm:text-4xl mb-1 sm:mb-2">💰</div>
             <p className="text-slate-600 text-xs sm:text-sm">Receita Total</p>
-            <p className="text-xl sm:text-2xl font-bold">MT {Number(stats.revenue).toFixed(2)}</p>
+            <p className="text-lg sm:text-2xl font-bold">MT {Number(stats.revenue).toFixed(2)}</p>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           <Link to="/admin/stores" className="bg-white border rounded-lg p-6 shadow-sm hover:shadow-md transition hover:border-blue-300">
             <div className="flex items-center gap-4">
               <div className="text-3xl">

@@ -51,7 +51,6 @@ function Footer() {
       const updatedUser = await upgradeToStoreOwner();
       await refreshUser();
       await refreshProducts();
-      await refreshProducts(); 
       setShowUpgradeModal(false);
       
       if (updatedUser?.storeId) {
