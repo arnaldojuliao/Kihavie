@@ -5,7 +5,6 @@ import { BsShieldCheck } from "react-icons/bs";
 
 function AdminUsersPage() {
   const [users, setUsers] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState(null);
   const [confirmAction, setConfirmAction] = useState(null);
 
@@ -16,7 +15,6 @@ function AdminUsersPage() {
     } catch (err) {
       setMessage({ type: "error", text: "Erro ao carregar utilizadores: " + err.message });
     }
-    setLoading(false);
   };
 
   useEffect(() => {
@@ -65,10 +63,6 @@ function AdminUsersPage() {
       default: return <FaUser className="text-slate-500" />;
     }
   };
-
-  if (loading) return (
-    <div className="p-8 text-center text-slate-500">Carregando utilizadores...</div>
-  );
 
   return (
     <div className="admin-users-page px-4 sm:px-6 py-4 sm:py-6">

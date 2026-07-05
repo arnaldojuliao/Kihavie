@@ -12,7 +12,6 @@ function RegisterForm() {
     phone: "",
   });
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { register } = useAuth();
 
@@ -35,8 +34,6 @@ function RegisterForm() {
       return;
     }
 
-    setLoading(true);
-
     try {
       await register({
         name: formData.name,
@@ -48,8 +45,6 @@ function RegisterForm() {
       navigate("/");
     } catch (err) {
       setError(err.message || "Erro ao criar conta");
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -136,10 +131,9 @@ function RegisterForm() {
 
       <button
         type="submit"
-        disabled={loading}
-        className="w-full bg-blue-600 text-white py-2 rounded-lg font-semibold hover:bg-blue-700 disabled:bg-slate-400 disabled:cursor-not-allowed"
+        className="w-full bg-blue-600 text-white py-2 rounded-lg font-semibold hover:bg-blue-700"
       >
-        {loading ? "Criando conta..." : "Criar conta"}
+        Criar conta
       </button>
 
       <p className="text-center text-slate-600 text-sm">

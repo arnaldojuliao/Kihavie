@@ -37,7 +37,6 @@ export const ProductProvider = ({ children }) => {
   const cachedStoreIds = loadFromCache(CACHE_KEY_STORE_IDS);
 
   const [products, setProducts] = useState(cachedProducts || []);
-  const [loading, setLoading] = useState(!cachedProducts);
   const [activeStoreIds, setActiveStoreIds] = useState(cachedStoreIds || []);
 
   useEffect(() => {
@@ -63,8 +62,6 @@ export const ProductProvider = ({ children }) => {
         saveToCache(CACHE_KEY_STORE_IDS, storeIds);
       } catch (error) {
         console.error("Erro ao carregar produtos:", error);
-      } finally {
-        setLoading(false);
       }
     };
     loadProducts();
@@ -98,7 +95,6 @@ export const ProductProvider = ({ children }) => {
 
   // Refrescar lista (útil após atualizações externas)
   const refreshProducts = () => {
-    setLoading(true);
     const loadProducts = async () => {
       try {
         const [allProducts, storeIds] = await Promise.all([
@@ -116,8 +112,6 @@ export const ProductProvider = ({ children }) => {
         saveToCache(CACHE_KEY_STORE_IDS, storeIds);
       } catch (error) {
         console.error("Erro ao recarregar produtos:", error);
-      } finally {
-        setLoading(false);
       }
     };
     loadProducts();
@@ -134,7 +128,6 @@ const activeProducts = products.filter(product => {
       value={{
         products,
         activeProducts,
-        loading,
         addProduct,
         deleteProduct,
         refreshProducts,

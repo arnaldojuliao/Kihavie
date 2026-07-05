@@ -23,7 +23,6 @@ function DashboardHome() {
     totalStores: 0,
     totalUsers: 0,
   });
-  const [loading, setLoading] = useState(true);
 
   // Função para carregar estatísticas globais para admin
   const fetchGlobalStats = async () => {
@@ -52,7 +51,6 @@ function DashboardHome() {
     } catch (err) {
       console.error("Erro ao carregar estatísticas globais:", err);
     }
-    setLoading(false);
   };
 
   useEffect(() => {
@@ -80,7 +78,6 @@ function DashboardHome() {
           console.error("Erro ao carregar estatísticas:", err);
         }
       }
-      setLoading(false);
     };
 
     fetchStats();
@@ -88,10 +85,6 @@ function DashboardHome() {
 
   // === ADMIN DASHBOARD ===
   if (isAdmin) {
-    if (loading) return (
-      <div className="p-8 text-center text-slate-500">Carregando painel admin...</div>
-    );
-
     return (
       <div className="admin-dashboard">
         <div className="mb-8">
@@ -190,9 +183,6 @@ function DashboardHome() {
       </div>
     );
   }
-
-  if (loading)
-    return <div className="p-8 text-center">Carregando estatísticas...</div>;
 
   return (
     <div className="dashboard-home">

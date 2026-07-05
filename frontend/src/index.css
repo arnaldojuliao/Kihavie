@@ -9,3 +9,9 @@
   --primary: #60a5fa;
   --secondary: #1e293b;
 }
+
+/* Fade-in animation for "Os Mais Vendidos" cards */
+.animate-fade-in {
+  opacity: 1 !important;
+  transform: translateY(0) !important;
+}

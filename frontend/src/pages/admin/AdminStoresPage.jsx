@@ -5,7 +5,6 @@ import { getAllStores, getStoreStats } from "../../services/storeService";
 function AdminStoresPage() {
   const navigate = useNavigate();
   const [stores, setStores] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [storeStatsMap, setStoreStatsMap] = useState({});
   const [stats, setStats] = useState({
     totalStores: 0,
@@ -40,13 +39,9 @@ function AdminStoresPage() {
         totalRevenue: totalRev,
       });
       setStores(allStores);
-      setLoading(false);
     };
     fetchData();
   }, []);
-
-  if (loading)
-    return <div className="p-8 text-center text-slate-500">Carregando...</div>;
 
   return (
     <div className="admin-stores-page px-4 sm:px-6 py-4 sm:py-6">

@@ -44,22 +44,6 @@ function Navbar() {
                 </Link>
               </>
             )}
-            {!isAdmin && (
-              <Link to="/dashboard" className="hover:text-blue-600" title="Painel">
-                <MdDashboard size={22} />
-              </Link>
-            )}
-            <Link to="/settings" className="hover:text-blue-600" title="Definições">
-              <FiSettings size={22} />
-            </Link>
-            <button
-              type="button"
-              onClick={handleLogout}
-              className="hover:text-red-600"
-              title="Sair"
-            >
-              <FiLogOut size={22} />
-            </button>
           </div>
         ) : (
           <Link to="/login" className="hover:text-blue-600" title="Entrar">

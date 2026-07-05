@@ -11,7 +11,6 @@ function ContactPage() {
     subject: "",
     message: "",
   });
-  const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
 
   const handleChange = (e) => {
@@ -21,16 +20,14 @@ function ContactPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
 
     try {
-      // Simular envio do formulário
       await new Promise((resolve) => setTimeout(resolve, 1000));
       setSuccess(true);
       setFormData({ name: "", email: "", subject: "", message: "" });
       setTimeout(() => setSuccess(false), 3000);
-    } finally {
-      setLoading(false);
+    } catch {
+      // erro ignorado
     }
   };
 
@@ -209,10 +206,9 @@ function ContactPage() {
 
               <button
                 type="submit"
-                disabled={loading}
-                className="w-full bg-blue-600 text-white active:scale-95 py-3 rounded-lg font-semibold hover:bg-blue-700 disabled:bg-slate-400 disabled:cursor-not-allowed"
+                className="w-full bg-blue-600 text-white active:scale-95 py-3 rounded-lg font-semibold hover:bg-blue-700"
               >
-                {loading ? "Enviando..." : "Enviar mensagem"}
+                Enviar mensagem
               </button>
             </form>
           </div>

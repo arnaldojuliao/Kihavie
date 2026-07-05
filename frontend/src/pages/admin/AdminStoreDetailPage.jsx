@@ -14,7 +14,6 @@ function AdminStoreDetailPage() {
   const [products, setProducts] = useState([]);
   const [orders, setOrders] = useState([]);
   const [revenue, setRevenue] = useState(0);
-  const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState(null);
   const [editingProduct, setEditingProduct] = useState(null);
   const [editForm, setEditForm] = useState({ name: "", description: "", price: "", stock: "" });
@@ -23,7 +22,7 @@ function AdminStoreDetailPage() {
 
   const fetchData = async () => {
     const storeData = await getStoreById(storeId);
-    if (!storeData) { setLoading(false); return; }
+    if (!storeData) return;
     setStore(storeData);
     const storeProducts = await getProductsByStoreId(storeId);
     setProducts(storeProducts);
@@ -31,7 +30,6 @@ function AdminStoreDetailPage() {
     setOrders(storeOrders);
     const totalRevenue = await getStoreRevenue(storeId);
     setRevenue(totalRevenue);
-    setLoading(false);
   };
 
   useEffect(() => {
@@ -106,7 +104,6 @@ function AdminStoreDetailPage() {
     }
   };
 
-  if (loading) return <div className="p-8 text-center text-slate-500">Carregando...</div>;
   if (!store) return <div className="p-8 text-center">Loja não encontrada</div>;
 
   return (

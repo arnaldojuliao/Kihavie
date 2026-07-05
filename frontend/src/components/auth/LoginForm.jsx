@@ -6,22 +6,18 @@ function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { login } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-    setLoading(true);
 
     try {
       await login({ email, password });
       navigate("/");
     } catch (err) {
       setError(err.message || "Erro ao fazer login");
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -63,10 +59,9 @@ function LoginForm() {
 
       <button
         type="submit"
-        disabled={loading}
-        className="w-full bg-blue-600 text-white py-2 rounded-lg font-semibold hover:bg-blue-700 disabled:bg-slate-400 disabled:cursor-not-allowed"
+        className="w-full bg-blue-600 text-white py-2 rounded-lg font-semibold hover:bg-blue-700"
       >
-        {loading ? "Entrando..." : "Entrar"}
+        Entrar
       </button>
 
       <p className="text-center text-slate-600 text-sm">

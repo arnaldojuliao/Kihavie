@@ -1,37 +1,35 @@
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect } from "react";
 import ProductGrid from "../components/product/ProductGrid";
-import ProductCard from "../components/product/ProductCard";
 import { useProducts } from "../context/ProductContext";
 import { Link } from "react-router-dom";
 
 function Home() {
   const { activeProducts } = useProducts();
-  const scrollRef = useRef(null);
-  const animRef = useRef(null);
-  const [isHovered, setIsHovered] = useState(false);
-
-  // Duplicar produtos para dar volume ao scroll infinito
-  const extendedProducts = [...activeProducts, ...activeProducts, ...activeProducts];
+  const topProducts = activeProducts.slice(0, 4);
+  const cardRefs = useRef([]);
 
   useEffect(() => {
-    const animate = () => {
-      if (!scrollRef.current || isHovered) {
-        animRef.current = requestAnimationFrame(animate);
-        return;
-      }
-      const container = scrollRef.current;
-      container.scrollLeft += 0.8;
-      const maxScroll = container.scrollWidth - container.clientWidth;
-      if (container.scrollLeft >= maxScroll - 10) {
-        container.scrollLeft = container.clientWidth * 0.33;
-      }
-      animRef.current = requestAnimationFrame(animate);
-    };
-    animRef.current = requestAnimationFrame(animate);
+    const currentRefs = cardRefs.current;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("animate-fade-in");
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.15 }
+    );
+    currentRefs.forEach((ref) => {
+      if (ref) observer.observe(ref);
+    });
     return () => {
-      if (animRef.current) cancelAnimationFrame(animRef.current);
+      currentRefs.forEach((ref) => {
+        if (ref) observer.unobserve(ref);
+      });
     };
-  }, [isHovered]);
+  }, [topProducts]);
 
   return (
     <div className="home-page">
@@ -54,22 +52,37 @@ function Home() {
           </p>
         </div>
 
-        <div
-          ref={scrollRef}
-          className="overflow-x-auto flex gap-4 pb-3 scroll-smooth"
-          style={{ scrollbarWidth: "thin" }}
-          onMouseEnter={() => setIsHovered(true)}
-          onMouseLeave={() => setIsHovered(false)}
-        >
-          {extendedProducts.length > 0 ? (
-            extendedProducts.map((product, index) => (
-              <div
-                key={`${product.id}-${index}`}
-                className="shrink-0 w-44 sm:w-52"
-              >
-                <ProductCard product={product} />
-              </div>
-            ))
+        <div className="overflow-x-auto flex gap-3 pb-3 scroll-smooth snap-x snap-mandatory" style={{ scrollbarWidth: "thin" }}>
+          {topProducts.length > 0 ? (
+            topProducts.map((product, index) => {
+              const image =
+                product.images?.[0] ||
+                product.image ||
+                "https://via.placeholder.com/250?text=Sem+imagem";
+              return (
+                <Link
+                  key={product.id}
+                  ref={(el) => { cardRefs.current[index] = el; }}
+                  to={`/product/${product.id}`}
+                  className="shrink-0 w-[calc(50%-0.375rem)] sm:w-[calc(25%-0.75rem)] snap-start group opacity-0 translate-y-6 transition-all duration-500 ease-out"
+                >
+                  <div className="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-lg transition-shadow">
+                    <div className="aspect-square bg-slate-100 overflow-hidden">
+                      <img
+                        src={image}
+                        alt={product.name}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                    </div>
+                    <div className="p-2 sm:p-3">
+                      <h3 className="font-semibold text-xs sm:text-sm text-center truncate">
+                        {product.name}
+                      </h3>
+                    </div>
+                  </div>
+                </Link>
+              );
+            })
           ) : (
             <p className="text-slate-500 text-center w-full py-8">
               Nenhum produto disponível no momento.
