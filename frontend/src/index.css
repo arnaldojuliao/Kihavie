@@ -10,8 +10,11 @@
   --secondary: #1e293b;
 }
 
-/* Fade-in animation for "Os Mais Vendidos" cards */
-.animate-fade-in {
-  opacity: 1 !important;
-  transform: translateY(0) !important;
+/* Hide scrollbar for carousel track */
+.hidden-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.hidden-scrollbar::-webkit-scrollbar {
+  display: none;
 }
