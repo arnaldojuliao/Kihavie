@@ -19,9 +19,11 @@ function Home() {
   const carouselProducts = [...mobileProducts, ...mobileProducts];
 
   const getStep = useCallback(() => {
-    const firstCard = trackRef.current?.children[0];
+    const track = trackRef.current;
+    const firstCard = track?.children[0];
     if (!firstCard) return 112;
-    return firstCard.offsetWidth + 12;
+    const gap = parseFloat(getComputedStyle(track).gap) || 12;
+    return firstCard.offsetWidth + gap;
   }, []);
 
   // Card-by-card auto-scroll every 3 seconds (Shoppable UGC Video Slider style)
@@ -37,8 +39,8 @@ function Home() {
       const step = getStep();
       const currentScroll = track.scrollLeft;
 
-      // If we've scrolled past the original set, reset seamlessly
-      if (currentScroll >= step * (halfIndex - 0.5)) {
+      // If we've scrolled into the duplicate set, reset seamlessly
+      if (currentScroll >= step * halfIndex) {
         track.scrollLeft = 0;
       } else {
         track.scrollBy({ left: step, behavior: "smooth" });
@@ -120,12 +122,12 @@ function Home() {
           </p>
         </div>
 
-        <div className="relative group/carousel">
+        <div className="relative group/carousel overflow-hidden">
           {/* Left edge shadow */}
-          <div className="absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-white via-white/80 to-transparent pointer-events-none z-[5]" />
+          <div className="absolute left-0 top-0 bottom-0 w-8 sm:w-16 bg-gradient-to-r from-white via-white/80 to-transparent pointer-events-none z-[5]" />
 
           {/* Right edge shadow */}
-          <div className="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-white via-white/80 to-transparent pointer-events-none z-[5]" />
+          <div className="absolute right-0 top-0 bottom-0 w-8 sm:w-16 bg-gradient-to-l from-white via-white/80 to-transparent pointer-events-none z-[5]" />
 
           {/* Left arrow */}
           <button
@@ -147,7 +149,7 @@ function Home() {
 
           <div
             ref={trackRef}
-            className="flex items-end justify-center gap-1.5 sm:gap-3 overflow-x-auto hidden-scrollbar pb-2 pt-1 px-1"
+            className="flex items-end justify-start gap-1.5 sm:gap-3 overflow-x-auto snap-x snap-mandatory hidden-scrollbar pb-2 pt-1 px-1"
           >
             {carouselProducts.length > 0 ? (
               carouselProducts.map((product, index) => {
@@ -157,11 +159,11 @@ function Home() {
                   <Link
                     key={`${product.id}-${index}`}
                     to={`/product/${product.id}`}
-                    className={`shrink-0 group/card transition-all duration-300 ${isCenter ? "w-[130px] sm:w-[200px] md:w-[220px] scale-[1.03]" : "w-[90px] sm:w-[170px] md:w-[200px] opacity-90"}`}
+                    className={`shrink-0 snap-start group/card transition-all duration-300 ${isCenter ? "w-[110px] sm:w-[200px] md:w-[220px] sm:scale-[1.03]" : "w-[75px] sm:w-[170px] md:w-[200px] opacity-90"}`}
                   >
                     <div className={`bg-white rounded-2xl overflow-hidden shadow-[0_8px_24px_rgba(15,23,42,0.10)] hover:shadow-[0_12px_30px_rgba(15,23,42,0.16)] transition-all duration-300 relative border ${isCenter ? "border-blue-200 shadow-[0_10px_28px_rgba(37,99,235,0.16)]" : "border-slate-100"} ${isCenter ? "ring-1 ring-blue-100" : ""}`}>
                       {/* Image — tall portrait aspect ratio (UGC video style) */}
-                      <div className={`w-full ${isCenter ? "h-[180px] sm:h-[270px] md:h-[290px]" : "h-[120px] sm:h-[230px] md:h-[250px]"} bg-slate-100 overflow-hidden relative rounded-t-2xl`}>
+                      <div className={`w-full ${isCenter ? "h-[150px] sm:h-[270px] md:h-[290px]" : "h-[100px] sm:h-[230px] md:h-[250px]"} bg-slate-100 overflow-hidden relative rounded-t-2xl`}>
                         <img
                           src={image}
                           alt={product.name}
