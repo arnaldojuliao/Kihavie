@@ -122,7 +122,7 @@ function Home() {
           </p>
         </div>
 
-        <div className="relative group/carousel overflow-hidden max-w-[390px] sm:max-w-none mx-auto sm:mx-0">
+        <div className="relative group/carousel overflow-hidden max-w-[390px] sm:max-w-[480px] md:max-w-[560px] mx-auto">
           {/* Left edge shadow */}
           <div className="absolute left-0 top-0 bottom-0 w-8 sm:w-16 bg-gradient-to-r from-white via-white/80 to-transparent pointer-events-none z-[5]" />
 
@@ -159,7 +159,7 @@ function Home() {
                   <Link
                     key={`${product.id}-${index}`}
                     to={`/product/${product.id}`}
-                    className={`shrink-0 snap-start group/card transition-all duration-300 ${isCenter ? "w-[220px] sm:w-[200px] md:w-[220px] sm:scale-[1.03]" : "w-[85px] sm:w-[170px] md:w-[200px] opacity-90"}`}
+                    className={`shrink-0 snap-start group/card transition-all duration-300 ${isCenter ? "w-[220px] sm:w-[260px] md:w-[300px] sm:scale-[1.03]" : "w-[85px] sm:w-[100px] md:w-[120px] opacity-90"}`}
                   >
                     <div className={`bg-white rounded-2xl overflow-hidden shadow-[0_8px_24px_rgba(15,23,42,0.10)] hover:shadow-[0_12px_30px_rgba(15,23,42,0.16)] transition-all duration-300 relative border ${isCenter ? "border-blue-200 shadow-[0_10px_28px_rgba(37,99,235,0.16)]" : "border-slate-100"} ${isCenter ? "ring-1 ring-blue-100" : ""}`}>
                       {/* Image — tall portrait aspect ratio (UGC video style)  nao vou tentar ver o conteudo mais sim vou tentar fazer de novo*/}
