@@ -1,104 +1,122 @@
-import { useRef, useEffect, useCallback } from "react";
-import { FiChevronLeft, FiChevronRight, FiShoppingCart } from "react-icons/fi";
+import { useState, useEffect, useRef, useCallback } from "react";
+import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import ProductGrid from "../components/product/ProductGrid";
 import { useProducts } from "../context/ProductContext";
-import { useCart } from "../context/CartContext";
 import { Link } from "react-router-dom";
 
 function Home() {
   const { activeProducts } = useProducts();
-  const { addToCart } = useCart();
-  const topProducts = activeProducts.slice(0, 4);
-  const mobileProducts = topProducts.slice(0, 3);
-  const trackRef = useRef(null);
-  const intervalRef = useRef(null);
+  const products = activeProducts.slice(0, 3);
+  const [currentIndex, setCurrentIndex] = useState(0);
   const isPausedRef = useRef(false);
-  const scrollTimeoutRef = useRef(null);
+  const intervalRef = useRef(null);
+  const timeoutRef = useRef(null);
 
-  // Duplicate products for seamless infinite loop
-  const carouselProducts = [...mobileProducts, ...mobileProducts];
+  const getProduct = useCallback(
+    (offset) => {
+      if (products.length === 0) return null;
+      return products[(currentIndex + offset + products.length) % products.length];
+    },
+    [products.length, currentIndex]
+  );
 
-  const getStep = useCallback(() => {
-    const track = trackRef.current;
-    const firstCard = track?.children[0];
-    if (!firstCard) return 112;
-    const gap = parseFloat(getComputedStyle(track).gap) || 12;
-    return firstCard.offsetWidth + gap;
-  }, []);
-
-  // Card-by-card auto-scroll every 3 seconds (Shoppable UGC Video Slider style)
+  // Auto-rotation every 3 seconds
   useEffect(() => {
-    const track = trackRef.current;
-    if (!track || mobileProducts.length === 0) return;
-
-    const halfIndex = mobileProducts.length;
-
-    const scrollNext = () => {
-      if (isPausedRef.current) return;
-
-      const step = getStep();
-      const currentScroll = track.scrollLeft;
-
-      // If we've scrolled into the duplicate set, reset seamlessly
-      if (currentScroll >= step * halfIndex) {
-        track.scrollLeft = 0;
-      } else {
-        track.scrollBy({ left: step, behavior: "smooth" });
+    if (products.length === 0) return;
+    intervalRef.current = setInterval(() => {
+      if (!isPausedRef.current) {
+        setCurrentIndex((prev) => (prev + 1) % products.length);
       }
-    };
-
-    intervalRef.current = setInterval(scrollNext, 3000);
-
-    // Pause on hover / touch
-    const handleMouseEnter = () => { isPausedRef.current = true; };
-    const handleMouseLeave = () => { isPausedRef.current = false; };
-    track.addEventListener("mouseenter", handleMouseEnter);
-    track.addEventListener("mouseleave", handleMouseLeave);
-
+    }, 3000);
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
-      if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
-      track.removeEventListener("mouseenter", handleMouseEnter);
-      track.removeEventListener("mouseleave", handleMouseLeave);
     };
-  }, [mobileProducts, getStep]);
+  }, [products.length]);
 
-  const scrollByCard = useCallback((direction) => {
-    const track = trackRef.current;
-    if (!track) return;
-
-    const step = getStep();
-
-    // Temporarily pause auto-scroll for 4 seconds
+  const goNext = useCallback(() => {
     isPausedRef.current = true;
-    if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
-    scrollTimeoutRef.current = setTimeout(() => {
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    timeoutRef.current = setTimeout(() => {
       isPausedRef.current = false;
     }, 4000);
+    setCurrentIndex((prev) => (prev + 1) % products.length);
+  }, [products.length]);
 
-    track.scrollBy({
-      left: direction === "left" ? -step : step,
-      behavior: "smooth",
-    });
-  }, [getStep]);
+  const goPrev = useCallback(() => {
+    isPausedRef.current = true;
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    timeoutRef.current = setTimeout(() => {
+      isPausedRef.current = false;
+    }, 4000);
+    setCurrentIndex((prev) => (prev - 1 + products.length) % products.length);
+  }, [products.length]);
 
   const getMainImage = (product) => {
+    if (!product) return "https://via.placeholder.com/250?text=Sem+imagem";
     if (product.images && product.images.length > 0) return product.images[0];
     if (product.image) return product.image;
     return "https://via.placeholder.com/250?text=Sem+imagem";
   };
 
-  const handleAddToCart = (e, product) => {
-    e.preventDefault();
-    e.stopPropagation();
-    addToCart({
-      id: product.id,
-      name: product.name,
-      price: product.price,
-      image: getMainImage(product),
-      quantity: 1,
-      storeId: product.storeId,
-    });
+  const centerProduct = getProduct(0);
+  const leftProduct = getProduct(-1);
+  const rightProduct = getProduct(1);
+
+  const renderCard = (product, position, widthClass, heightClass) => {
+    const isCenter = position === "center";
+    const image = getMainImage(product);
+    return (
+      <Link
+        key={position}
+        to={product ? `/product/${product.id}` : "#"}
+        className={`shrink-0 group/card transition-all duration-300 ${widthClass} ${isCenter ? "sm:scale-[1.03]" : "opacity-90"}`}
+        onMouseEnter={() => { isPausedRef.current = true; }}
+        onMouseLeave={() => { isPausedRef.current = false; }}
+      >
+        <div
+          className={`bg-white rounded-2xl overflow-hidden shadow-[0_8px_24px_rgba(15,23,42,0.10)] hover:shadow-[0_12px_30px_rgba(15,23,42,0.16)] transition-all duration-300 relative border ${
+            isCenter
+              ? "border-blue-200 shadow-[0_10px_28px_rgba(37,99,235,0.16)] ring-1 ring-blue-100"
+              : "border-slate-100"
+          }`}
+        >
+          {/* Animated content — remounts on product change */}
+          <div key={product?.id || position} className="animate-fade-slide-in">
+            <div className={`w-full ${heightClass} bg-slate-100 overflow-hidden relative rounded-t-2xl`}>
+              {product ? (
+                <img
+                  src={image}
+                  alt={product.name}
+                  className="w-full h-full object-cover group-hover/card:scale-105 transition-transform duration-500"
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-slate-400 text-xs">
+                  Sem produto
+                </div>
+              )}
+              {isCenter && product && (
+                <>
+                  <div className="absolute inset-x-0 top-0 h-12 bg-gradient-to-b from-slate-900/20 to-transparent" />
+                  <div className="absolute top-2 left-2 bg-blue-600/90 text-[10px] font-semibold text-white px-2 py-1 rounded-full">
+                    Destaque
+                  </div>
+                </>
+              )}
+            </div>
+            {/* Product name — always visible */}
+            {product && (
+              <div className="px-2 pb-2 pt-1.5">
+                <h4 className={`text-[10px] sm:text-xs leading-tight truncate font-medium ${
+                  isCenter ? "text-slate-900" : "text-slate-500"
+                }`}>
+                  {product.name}
+                </h4>
+              </div>
+            )}
+          </div>
+        </div>
+      </Link>
+    );
   };
 
   return (
@@ -131,7 +149,7 @@ function Home() {
 
           {/* Left arrow */}
           <button
-            onClick={() => scrollByCard("left")}
+            onClick={goPrev}
             className="hidden sm:flex absolute left-0 top-0 bottom-0 z-10 w-8 opacity-60 md:opacity-0 md:group-hover/carousel:opacity-100 transition-opacity duration-200 items-center justify-center bg-gradient-to-r from-white/80 to-transparent hover:from-white cursor-pointer"
             aria-label="Anterior"
           >
@@ -140,48 +158,21 @@ function Home() {
 
           {/* Right arrow */}
           <button
-            onClick={() => scrollByCard("right")}
+            onClick={goNext}
             className="hidden sm:flex absolute right-0 top-0 bottom-0 z-10 w-8 opacity-60 md:opacity-0 md:group-hover/carousel:opacity-100 transition-opacity duration-200 items-center justify-center bg-gradient-to-l from-white/80 to-transparent hover:from-white cursor-pointer"
             aria-label="Seguinte"
           >
             <FiChevronRight className="text-slate-700" size={22} />
           </button>
 
-          <div
-            ref={trackRef}
-            className="flex items-end justify-start gap-1.5 sm:gap-3 overflow-x-auto snap-x snap-mandatory hidden-scrollbar pb-2 pt-1 px-1"
-          >
-            {carouselProducts.length > 0 ? (
-              carouselProducts.map((product, index) => {
-                const image = getMainImage(product);
-                const isCenter = index % mobileProducts.length === 1;
-                return (
-                  <Link
-                    key={`${product.id}-${index}`}
-                    to={`/product/${product.id}`}
-                    className={`shrink-0 snap-start group/card transition-all duration-300 ${isCenter ? "w-[220px] sm:w-[260px] md:w-[300px] sm:scale-[1.03]" : "w-[100px] md:w-[120px] opacity-90"}`}
-                  >
-                    <div className={`bg-white rounded-2xl overflow-hidden shadow-[0_8px_24px_rgba(15,23,42,0.10)] hover:shadow-[0_12px_30px_rgba(15,23,42,0.16)] transition-all duration-300 relative border ${isCenter ? "border-blue-200 shadow-[0_10px_28px_rgba(37,99,235,0.16)]" : "border-slate-100"} ${isCenter ? "ring-1 ring-blue-100" : ""}`}>
-                      {/* Image — tall portrait aspect ratio (UGC video style)  nao vou tentar ver o conteudo mais sim vou tentar fazer de novo*/}
-                      <div className={`w-full ${isCenter ? "h-[150px] sm:h-[270px] md:h-[290px]" : "h-[100px] sm:h-[230px] md:h-[250px]"} bg-slate-100 overflow-hidden relative rounded-t-2xl`}>
-                        <img
-                          src={image}
-                          alt={product.name}
-                          className="w-full h-full object-cover group-hover/card:scale-105 transition-transform duration-500"
-                        />
-                        {isCenter && (
-                          <>
-                            <div className="absolute inset-x-0 top-0 h-12 bg-gradient-to-b from-slate-900/20 to-transparent" />
-                            <div className="absolute top-2 left-2 bg-blue-600/90 text-[10px] font-semibold text-white px-2 py-1 rounded-full">
-                              Destaque
-                            </div>
-                          </>
-                        )}
-                      </div>
-                    </div>
-                  </Link>
-                );
-              })
+          {/* 3 fixed molds — only the product content cycles */}
+          <div className="flex justify-center items-center gap-1.5 sm:gap-3 pb-2 pt-1 px-1">
+            {products.length > 0 ? (
+              <>
+                {renderCard(leftProduct, "left", "w-[100px] sm:w-[150px] md:w-[180px]", "h-[100px] sm:h-[230px] md:h-[250px]")}
+                {renderCard(centerProduct, "center", "w-[220px] sm:w-[260px] md:w-[300px]", "h-[150px] sm:h-[270px] md:h-[290px]")}
+                {renderCard(rightProduct, "right", "w-[100px] sm:w-[150px] md:w-[180px]", "h-[100px] sm:h-[230px] md:h-[250px]")}
+              </>
             ) : (
               <p className="text-slate-500 text-center w-full py-8">
                 Nenhum produto disponível no momento.
