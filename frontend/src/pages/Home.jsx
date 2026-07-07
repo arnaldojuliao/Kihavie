@@ -6,7 +6,7 @@ import { Link } from "react-router-dom";
 
 function Home() {
   const { activeProducts } = useProducts();
-  const products = activeProducts.slice(0, 3);
+  const products = activeProducts.slice(0, 5);
   const [currentIndex, setCurrentIndex] = useState(0);
   const isPausedRef = useRef(false);
   const intervalRef = useRef(null);
@@ -81,7 +81,7 @@ function Home() {
           }`}
         >
           {/* Animated content — remounts on product change */}
-          <div key={product?.id || position} className="animate-fade-slide-in">
+          <div key={product?.id || position} className={isCenter ? "animate-fade-scale-in" : "animate-fade-slide-in"}>
             <div className={`w-full ${heightClass} bg-slate-100 overflow-hidden relative rounded-t-2xl`}>
               {product ? (
                 <img

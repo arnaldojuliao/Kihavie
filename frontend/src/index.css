@@ -19,7 +19,7 @@
   display: none;
 }
 
-/* Fade-in animation for product cards */
+/* Fade-in animation for side cards */
 @keyframes fadeSlideIn {
   from {
     opacity: 0;
@@ -32,4 +32,19 @@
 }
 .animate-fade-slide-in {
   animation: fadeSlideIn 0.35s ease-out;
+}
+
+/* Fade + scale-in animation for center card */
+@keyframes fadeScaleIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px) scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+.animate-fade-scale-in {
+  animation: fadeScaleIn 0.4s cubic-bezier(0, 0.55, 0.25, 1);
 }
