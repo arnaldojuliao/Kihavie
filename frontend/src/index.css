@@ -31,7 +31,7 @@
   }
 }
 .animate-fade-slide-in {
-  animation: fadeSlideIn 0.35s ease-out;
+  animation: fadeSlideIn 4s ease-out;
 }
 
 /* Fade + scale-in animation for center card */
@@ -46,5 +46,5 @@
   }
 }
 .animate-fade-scale-in {
-  animation: fadeScaleIn 0.4s cubic-bezier(0, 0.55, 0.25, 1);
+  animation: fadeScaleIn 4s cubic-bezier(0, 0.60, 0.30, 1);
 }
