@@ -26,7 +26,13 @@ export const getCurrentUser = async () => {
     return user;
   } catch (err) {
     console.error('Erro ao buscar usuário:', err);
-    localStorage.removeItem('token');
+    // Só remove o token se for erro de autenticação (expirou/inválido)
+    // Erros de rede/timeout preservam o token para tentar novamente
+    if (err.message?.toLowerCase().includes('401') || 
+        err.message?.toLowerCase().includes('unauthorized') ||
+        err.message?.toLowerCase().includes('não autorizado')) {
+      localStorage.removeItem('token');
+    }
     return null;
   }
 };

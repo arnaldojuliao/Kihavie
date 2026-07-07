@@ -1,6 +1,9 @@
 // services/api.js
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
+// Timeout global para requisições (8 segundos)
+const REQUEST_TIMEOUT_MS = 8000;
+
 const getToken = () => localStorage.getItem('token'); // PADRÃO: "token"
 
 export const apiCall = async (endpoint, options = {}) => {
@@ -13,30 +16,44 @@ export const apiCall = async (endpoint, options = {}) => {
     headers['Authorization'] = `Bearer ${token}`;
   }
 
+  // Cria um AbortController com timeout para evitar hangs
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+
   const config = {
     ...options,
     headers,
+    signal: controller.signal,
   };
 
-  const response = await fetch(`${API_URL}${endpoint}`, config);
-  
-  // Resposta pode ser vazia (204 No Content)
-  if(response.status === 204) {
-    return null;
-  }
-  
-  let data = null;
-  const contentType = response.headers.get('content-type');
-  if (contentType && contentType.includes('application/json')) {
-    data = await response.json();
-  }
+  try {
+    const response = await fetch(`${API_URL}${endpoint}`, config);
+    
+    // Resposta pode ser vazia (204 No Content)
+    if(response.status === 204) {
+      return null;
+    }
+    
+    let data = null;
+    const contentType = response.headers.get('content-type');
+    if (contentType && contentType.includes('application/json')) {
+      data = await response.json();
+    }
 
-  if (!response.ok) {
-    const errorMsg = data?.error || data?.message || 'Erro na requisição';
-    throw new Error(errorMsg);
-  }
+    if (!response.ok) {
+      const errorMsg = data?.error || data?.message || 'Erro na requisição';
+      throw new Error(errorMsg);
+    }
 
-  return data;
+    return data;
+  } catch (err) {
+    if (err.name === 'AbortError') {
+      throw new Error('Timeout: o servidor não respondeu a tempo');
+    }
+    throw err;
+  } finally {
+    clearTimeout(timeoutId);
+  }
 };
 
 // Funções específicas para autenticação

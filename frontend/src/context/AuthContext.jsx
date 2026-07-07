@@ -41,15 +41,45 @@ export const AuthProvider = ({ children }) => {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   // profileImage agora é derivado de user.profileImage via profileImageValue
 
-  // Carregar usuário ao iniciar
+  // Carregar usuário ao iniciar com retry automático
   useEffect(() => {
+    let cancelled = false;
+    let retryCount = 0;
+    const MAX_RETRIES = 12; // ~60s de tentativas com backoff
+    const BASE_DELAY = 2000; // 2s inicial, vai aumentando
+
+    // Guarda o token ANTES de chamar getCurrentUser, pois ela pode removê-lo
+    const savedToken = localStorage.getItem('token');
+
     const loadUser = async () => {
+      if (cancelled) return;
+
       setIsLoading(true);
       const userData = await getCurrentUser();
+      if (cancelled) return;
+
+      // Se não conseguiu conectar ao backend, tenta novamente
+      if (!userData && savedToken) {
+        retryCount++;
+        if (retryCount <= MAX_RETRIES) {
+          const delay = Math.min(BASE_DELAY * Math.pow(1.5, retryCount - 1), 15000);
+          console.log(`Aguardando servidor... tentativa ${retryCount}/${MAX_RETRIES} (${Math.round(delay/1000)}s)`);
+          setTimeout(loadUser, delay);
+          return;
+        }
+        // Esgotou tentativas: remove token inválido
+        localStorage.removeItem('token');
+      }
+
       setUser(userData);
       setIsLoading(false);
     };
+
     loadUser();
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const profileImageValue = user?.profileImage || null;
