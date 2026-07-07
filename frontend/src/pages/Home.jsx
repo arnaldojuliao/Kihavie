@@ -122,7 +122,7 @@ function Home() {
           </p>
         </div>
 
-        <div className="relative group/carousel overflow-hidden">
+        <div className="relative group/carousel overflow-hidden max-w-[390px] sm:max-w-none mx-auto sm:mx-0">
           {/* Left edge shadow */}
           <div className="absolute left-0 top-0 bottom-0 w-8 sm:w-16 bg-gradient-to-r from-white via-white/80 to-transparent pointer-events-none z-[5]" />
 
@@ -159,10 +159,10 @@ function Home() {
                   <Link
                     key={`${product.id}-${index}`}
                     to={`/product/${product.id}`}
-                    className={`shrink-0 snap-start group/card transition-all duration-300 ${isCenter ? "w-[110px] sm:w-[200px] md:w-[220px] sm:scale-[1.03]" : "w-[75px] sm:w-[170px] md:w-[200px] opacity-90"}`}
+                    className={`shrink-0 snap-start group/card transition-all duration-300 ${isCenter ? "w-[220px] sm:w-[200px] md:w-[220px] sm:scale-[1.03]" : "w-[85px] sm:w-[170px] md:w-[200px] opacity-90"}`}
                   >
                     <div className={`bg-white rounded-2xl overflow-hidden shadow-[0_8px_24px_rgba(15,23,42,0.10)] hover:shadow-[0_12px_30px_rgba(15,23,42,0.16)] transition-all duration-300 relative border ${isCenter ? "border-blue-200 shadow-[0_10px_28px_rgba(37,99,235,0.16)]" : "border-slate-100"} ${isCenter ? "ring-1 ring-blue-100" : ""}`}>
-                      {/* Image — tall portrait aspect ratio (UGC video style) */}
+                      {/* Image — tall portrait aspect ratio (UGC video style)  nao vou tentar ver o conteudo mais sim vou tentar fazer de novo*/}
                       <div className={`w-full ${isCenter ? "h-[150px] sm:h-[270px] md:h-[290px]" : "h-[100px] sm:h-[230px] md:h-[250px]"} bg-slate-100 overflow-hidden relative rounded-t-2xl`}>
                         <img
                           src={image}
@@ -177,27 +177,6 @@ function Home() {
                             </div>
                           </>
                         )}
-                        {/* Price badge overlay */}
-                        <div className="absolute bottom-2 left-2 bg-black/70 text-white text-[10px] sm:text-xs font-bold px-2.5 py-1 rounded-full backdrop-blur-sm">
-                          MT {Number(product.price).toFixed(2)}
-                        </div>
-                        {/* Shopping CTA — always visible on mobile, hover on desktop */}
-                        <button
-                          onClick={(e) => handleAddToCart(e, product)}
-                          className="absolute bottom-2 right-2 bg-blue-600 text-white p-2 rounded-full shadow-lg hover:bg-blue-700 active:scale-90 transition-all duration-200 md:opacity-0 md:group-hover/card:opacity-100"
-                          aria-label="Adicionar ao carrinho"
-                        >
-                          <FiShoppingCart size={16} />
-                        </button>
-                      </div>
-                      {/* Product info */}
-                      <div className="p-2.5">
-                        <h3 className={`font-semibold text-[10px] sm:text-sm leading-tight truncate ${isCenter ? "text-slate-900" : "text-slate-700"}`}>
-                          {product.name}
-                        </h3>
-                        <p className="text-[9px] sm:text-xs text-slate-400 mt-0.5 truncate">
-                          {product.description || "Produto popular"}
-                        </p>
                       </div>
                     </div>
                   </Link>
